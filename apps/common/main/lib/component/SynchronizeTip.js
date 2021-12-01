@@ -81,6 +81,7 @@ define([
                 this.showButton = this.options.showButton;
                 this.closable = this.options.closable;
                 this.textButton = this.options.textButton || '';
+                this.position = this.options.position;
             },
 
             render: function() {
@@ -118,6 +119,11 @@ define([
                 var showxy = this.target.offset();
                 if (this.placement=='target') {
                     this.cmpEl.css({top : showxy.top + 5 + 'px', left: showxy.left + 5 + 'px'});
+                    return;
+                }
+
+                if (this.position) {
+                    this.cmpEl.css({top : this.position[0] + 'px', left: this.position[1] + 'px'});
                     return;
                 }
 

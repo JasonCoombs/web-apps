@@ -1460,10 +1460,52 @@ define([
                 }
             },
 
-            onError: function(id, level, errData) {
+            onError: function(id, level, errData, callback) {
                 if (id == Asc.c_oAscError.ID.LoadingScriptError) {
                     this.showTips([this.scriptLoadError]);
                     this.tooltip && this.tooltip.getBSTip().$tip.css('z-index', 10000);
+                    return;
+                }
+
+                if (id == Asc.c_oAscError.ID.FillAllRowsWarning) {
+                    var getPosition = function (x, y, width) {
+                        var offset = $('#editor_sdk').offset(),
+                            _placement = 'right',
+                            _y = offset.top + y - 5,
+                            _x = offset.left + x + width - 8;
+                        if (_x + 300 >= Common.Utils.innerWidth()) {
+                            _x = _x - width - 300 + 16;
+                            _placement = 'left';
+                        }
+                        return {
+                            x: _x,
+                            y: _y,
+                            placement: _placement
+                        };
+                    };
+                    var position = getPosition(errData[0].asc_getX(), errData[0].asc_getY(), errData[0].asc_getWidth());
+                    var tip = new Common.UI.SynchronizeTip({
+                        target: $('#editor_sdk'),
+                        text: !!this.appOptions.isDesktopApp ?
+                            Common.Utils.String.format(this.textFormulaFilledAllRows, errData[1]) :
+                            (errData[2] <= 10000 ? this.textFormulaFilledFirstRowsOtherIsEmpty : Common.Utils.String.format(this.textFormulaFilledFirstRowsOtherHaveData, errData[2] - errData[1])), // errData[1] - filled, errData[2] - all
+                        placement: 'bottom-' + position.placement,
+                        position: [position.y, position.x],
+                        showLink: !!this.appOptions.isDesktopApp,
+                        textLink: !!this.appOptions.isDesktopApp ? this.textFillOtherRows : null
+                    });
+                    tip.on({
+                        'dontshowclick': _.bind(function () {
+                            tip.hide();
+                            if (_.isFunction(callback)) {
+                                callback();
+                            }
+                        }, this),
+                        'closeclick': _.bind(function() {
+                            tip.hide();
+                        }, this)
+                    });
+                    tip.show();
                     return;
                 }
 
@@ -3397,7 +3439,11 @@ define([
             uploadDocFileCountMessage: 'No documents uploaded.',
             errorLoadingFont: 'Fonts are not loaded.<br>Please contact your Document Server administrator.',
             textNeedSynchronize: 'You have an updates',
-            textChangesSaved: 'All changes saved'
+            textChangesSaved: 'All changes saved',
+            textFillOtherRows: 'Fill other rows',
+            textFormulaFilledAllRows: 'Formula filled {0} rows have data. Filling other empty rows may take a few minutes.',
+            textFormulaFilledFirstRowsOtherIsEmpty: 'Formula filled only first 10,000 rows by memory save reason. Other rows in this sheet don\'t have data.',
+            textFormulaFilledFirstRowsOtherHaveData: 'Formula filled only first 10,000 rows have data by memory save reason. There are other {0} rows have data in this sheet. You can fill them manually.'
         }
     })(), SSE.Controllers.Main || {}))
 });
