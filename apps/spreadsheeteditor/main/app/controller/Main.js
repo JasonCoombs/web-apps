@@ -1483,12 +1483,14 @@ define([
                             placement: _placement
                         };
                     };
-                    var position = getPosition(errData[0].asc_getX(), errData[0].asc_getY(), errData[0].asc_getWidth());
+                    var position = getPosition(errData[0].asc_getX(), errData[0].asc_getY(), errData[0].asc_getWidth()),
+                        fill = errData[1],
+                        have = errData[2];
                     var tip = new Common.UI.SynchronizeTip({
                         target: $('#editor_sdk'),
                         text: !!this.appOptions.isDesktopApp ?
-                            Common.Utils.String.format(this.textFormulaFilledAllRows, errData[1]) :
-                            (errData[2] <= 10000 ? this.textFormulaFilledFirstRowsOtherIsEmpty : Common.Utils.String.format(this.textFormulaFilledFirstRowsOtherHaveData, errData[2] - errData[1])), // errData[1] - filled, errData[2] - all
+                            (fill > have ? this.textFormulaFilledAllRowsWithEmpty : Common.Utils.String.format(this.textFormulaFilledAllRows, fill)) :
+                            (fill >= have ? this.textFormulaFilledFirstRowsOtherIsEmpty : Common.Utils.String.format(this.textFormulaFilledFirstRowsOtherHaveData, have - fill)),
                         placement: 'bottom-' + position.placement,
                         position: [position.y, position.x],
                         showLink: !!this.appOptions.isDesktopApp,
@@ -3442,6 +3444,7 @@ define([
             textChangesSaved: 'All changes saved',
             textFillOtherRows: 'Fill other rows',
             textFormulaFilledAllRows: 'Formula filled {0} rows have data. Filling other empty rows may take a few minutes.',
+            textFormulaFilledAllRowsWithEmpty: 'Formula filled first 10,000 rows. Filling other empty rows may take a few minutes.',
             textFormulaFilledFirstRowsOtherIsEmpty: 'Formula filled only first 10,000 rows by memory save reason. Other rows in this sheet don\'t have data.',
             textFormulaFilledFirstRowsOtherHaveData: 'Formula filled only first 10,000 rows have data by memory save reason. There are other {0} rows have data in this sheet. You can fill them manually.'
         }
