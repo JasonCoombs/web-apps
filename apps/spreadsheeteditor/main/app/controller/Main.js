@@ -1485,29 +1485,30 @@ define([
                     };
                     var position = getPosition(errData[0].asc_getX(), errData[0].asc_getY(), errData[0].asc_getWidth()),
                         fill = errData[1],
-                        have = errData[2];
-                    var tip = new Common.UI.SynchronizeTip({
+                        have = errData[2],
+                        fillWithSeparator = fill.toLocaleString(this.appOptions.lang);
+                    this.tipFillAllRows = new Common.UI.SynchronizeTip({
                         target: $('#editor_sdk'),
                         text: !!this.appOptions.isDesktopApp ?
-                            (fill > have ? this.textFormulaFilledAllRowsWithEmpty : Common.Utils.String.format(this.textFormulaFilledAllRows, fill)) :
-                            (fill >= have ? this.textFormulaFilledFirstRowsOtherIsEmpty : Common.Utils.String.format(this.textFormulaFilledFirstRowsOtherHaveData, have - fill)),
+                            (fill > have ? Common.Utils.String.format(this.textFormulaFilledAllRowsWithEmpty, fillWithSeparator) : Common.Utils.String.format(this.textFormulaFilledAllRows, fillWithSeparator)) :
+                            (fill >= have ? Common.Utils.String.format(this.textFormulaFilledFirstRowsOtherIsEmpty, fillWithSeparator) : Common.Utils.String.format(this.textFormulaFilledFirstRowsOtherHaveData, fillWithSeparator, (have - fill).toLocaleString(this.appOptions.lang))),
                         placement: 'bottom-' + position.placement,
                         position: [position.y, position.x],
                         showLink: !!this.appOptions.isDesktopApp,
                         textLink: !!this.appOptions.isDesktopApp ? this.textFillOtherRows : null
                     });
-                    tip.on({
+                    this.tipFillAllRows.on({
                         'dontshowclick': _.bind(function () {
-                            tip.hide();
+                            this.tipFillAllRows.close();
                             if (_.isFunction(callback)) {
                                 callback();
                             }
                         }, this),
                         'closeclick': _.bind(function() {
-                            tip.hide();
+                            this.tipFillAllRows.close();
                         }, this)
                     });
-                    tip.show();
+                    this.tipFillAllRows.show();
                     return;
                 }
 
@@ -3444,9 +3445,9 @@ define([
             textChangesSaved: 'All changes saved',
             textFillOtherRows: 'Fill other rows',
             textFormulaFilledAllRows: 'Formula filled {0} rows have data. Filling other empty rows may take a few minutes.',
-            textFormulaFilledAllRowsWithEmpty: 'Formula filled first 10,000 rows. Filling other empty rows may take a few minutes.',
-            textFormulaFilledFirstRowsOtherIsEmpty: 'Formula filled only first 10,000 rows by memory save reason. Other rows in this sheet don\'t have data.',
-            textFormulaFilledFirstRowsOtherHaveData: 'Formula filled only first 10,000 rows have data by memory save reason. There are other {0} rows have data in this sheet. You can fill them manually.'
+            textFormulaFilledAllRowsWithEmpty: 'Formula filled first {0} rows. Filling other empty rows may take a few minutes.',
+            textFormulaFilledFirstRowsOtherIsEmpty: 'Formula filled only first {0} rows by memory save reason. Other rows in this sheet don\'t have data.',
+            textFormulaFilledFirstRowsOtherHaveData: 'Formula filled only first {0} rows have data by memory save reason. There are other {1} rows have data in this sheet. You can fill them manually.'
         }
     })(), SSE.Controllers.Main || {}))
 });
